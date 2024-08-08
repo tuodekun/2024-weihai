@@ -92,6 +92,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   G4double AlThickness = 1.0 * mm; // Modified thickness for clarification
   G4int nofModules = 40;
   G4int nofFibers = 9;
+  G4double worldSizeZ  = 2.5 * m;   //  Particle Gun located (0, 0, -worldSizeZ / 2)
 
   auto moduleZ = fiber1Z + AlThickness + fiber2Z;
   auto moduleBound = moduleXY - holeXY * nofFibers;
@@ -99,7 +100,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   auto calorXY = nofModules * moduleXY;
   auto calorZ = moduleZ;
   auto worldSizeXY = 1.2 * calorXY;
-  auto worldSizeZ  = 3 * m;   //for Particle Gun in the world (2*m)
+  auto calorLowPosZ = -worldSizeZ / 2 + 2 * m; // Calorimeter lower surface located 2m above Particle Gun
+  auto calorPosZ = calorLowPosZ + calorZ / 2;
 
   // Get materials
   auto air = G4Material::GetMaterial("G4_AIR");
@@ -126,7 +128,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   //  
   auto solidCalor = new G4Box("Calorimeter", calorXY / 2, calorXY / 2, calorZ / 2);
   auto logicCalor = new G4LogicalVolume(solidCalor, vac, "Calorimeter");
-  auto physCalor = new G4PVPlacement(nullptr, G4ThreeVector(0,0,-1*m), logicCalor, "Calorimeter", logicWorld, false, 0, true);
+  auto physCalor = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, calorPosZ), logicCalor, "Calorimeter", logicWorld, false, 0, true);
 
   //                               
   // Module Strip
